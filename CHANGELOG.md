@@ -2,6 +2,16 @@
 
 Biçim [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/), sürümleme [SemVer](https://semver.org/lang/tr/) ilkelerine dayanır.
 
+## [1.0.2] - 2026-10-29
+
+### Güvenlik
+- Paylaşım bağlantısındaki rota rengi/adı ve arama sonuçlarındaki yer adları HTML olarak sayfaya yerleştiriliyordu. Kötü niyetli bir bağlantı ya da düzenlenmiş bir OSM yer adı sitede kod çalıştırıp tarayıcıdaki kayıtlı rotaları okuyabilirdi. Renk artık yalnızca `#rrggbb` kabul eder, ad ve yer adları düz metin olarak yerleştirilir, koordinatlar sayıya zorlanır.
+
+### Düzeltildi
+- 481 ile 689 px arası genişlikte (dar pencere, tablet, yatay telefon) arama sonucu seçilince ya da paylaşılan rota açılınca harita ilçe/şehir ölçeğine uzaklaşıyordu. Sığdırma payı artık sabit bir eşik yerine panelin gerçek konumundan hesaplanır.
+- Aramada yazarken hiçbir geri bildirim yoktu, "çalışmıyor" hissi veriyordu. Artık yazarken "ara ↵" satırı çıkar, arama sürerken "Aranıyor…", servis hata verirse açıklayıcı bir mesaj gösterilir.
+- Dar ekranda bir sonuç seçilince panel kendiliğinden katlanır, harita görünür.
+
 ## [1.0.1] - 2026-10-29
 
 ### Düzeltildi

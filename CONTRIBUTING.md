@@ -13,7 +13,7 @@ Derleme adımı yoktur. Bkz. [README: Yerelde çalıştırma](README.md#yerelde-
 3. Testi çalıştır, PR aç.
 
 ## Sürüm çıkarırken
-`index.html` içindeki sürüm etiketini (`v1.0.1`) ve `assets/` adreslerindeki `?v=1.0.1` değerini birlikte artır, `CHANGELOG.md` içine not düş. Aksi halde ziyaretçilerin tarayıcısı eski kodu önbellekten çalıştırabilir.
+`index.html` içindeki sürüm etiketini (`v1.0.2`) ve `assets/` adreslerindeki `?v=1.0.2` değerini birlikte artır, `CHANGELOG.md` içine not düş. Aksi halde ziyaretçilerin tarayıcısı eski kodu önbellekten çalıştırabilir.
 
 ## Kurallar
 - **Gizli bilgi commit etme.** Özellikle `.p8` dosyalarını ve özel anahtarları. `config.js` herkese açıktır.

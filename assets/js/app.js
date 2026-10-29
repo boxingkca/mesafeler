@@ -95,8 +95,9 @@ document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==
 
 // ---- route lifecycle ----
 function makeRoute(o){
-  const color=o.color||PALETTE[routes.length%PALETTE.length];
-  const r={id:++seq,name:o.name||("Rota "+(routes.length+1)),color,pts:o.pts||[],
+  // Paylaşım bağlantısından gelen değerler güvenilmezdir: renk yalnızca #rrggbb, ad düz metin ve kısa
+  const color=/^#[0-9a-fA-F]{6}$/.test(String(o.color||""))?o.color:PALETTE[routes.length%PALETTE.length];
+  const r={id:++seq,name:String(o.name||("Rota "+(routes.length+1))).slice(0,60),color,pts:(o.pts||[]).filter(p=>p&&isFinite(p.lat)&&isFinite(p.lng)).map(p=>({lat:+p.lat,lng:+p.lng})),
     snap:!!o.snap,polyline:L.polyline([],{color,weight:4,opacity:.9}).addTo(map),
     markers:[],snappedLen:o.snappedLen??null,legs:o.legs??null,snapGeom:null};
   routes.push(r); rebuildMarkers(r); drawLine(r);
@@ -146,13 +147,14 @@ async function snapRoute(r){
 function refresh(r){ drawLine(r); if(r.snap) snapRoute(r); renderPanel(); renderRoutes(); persist(); }
 function routeTotal(r){ if(r.snap && r.snappedLen!=null) return r.snappedLen; return straightData(r).total; }
 // Panelin kapladığı alanı hesaba katan sığdırma payı (masaüstü: sol sütun, mobil: üst panel)
-const isMobile=()=>innerWidth<=480;
+// Panel 330 px genişliğinde sol üstte durur. Yanında yeterli harita alanı yoksa (dar pencere,
+// tablet, yatay telefon) harita panelin ALTINDAKİ alana sığdırılır; aksi halde sol boşluk
+// ekrandan büyük kalır ve harita dünya ölçeğine uzaklaşır.
+const isNarrow=()=>innerWidth<690;
 function fitPad(){
-  if(isMobile()){
-    const ph=document.querySelector("#panel").offsetHeight;
-    return {paddingTopLeft:[24,Math.min(ph+16,innerHeight*.62)],paddingBottomRight:[24,24]};
-  }
-  return {paddingTopLeft:[350,40],paddingBottomRight:[40,40]};
+  const pr=document.querySelector("#panel").getBoundingClientRect();
+  if(isNarrow()) return {paddingTopLeft:[24,Math.round(Math.min(pr.bottom+16,innerHeight*.62))],paddingBottomRight:[24,24]};
+  return {paddingTopLeft:[Math.round(pr.right+24),40],paddingBottomRight:[40,40]};
 }
 function flyToRoute(r){
   if(!r.pts.length)return;
@@ -200,7 +202,7 @@ function renderRoutes(){
         meta+='<span class="rdelta" title="En kısa rotadan '+fmtStr(dd)+' (%'+pct+') daha uzun">+'+fmtStr(dd)+' · %'+pct+'</span>'; }
     }
     div.innerHTML='<span class="dot" style="background:'+r.color+'"></span>'+
-      '<span class="rn"><input value="'+r.name.replace(/"/g,'&quot;')+'" spellcheck="false"/></span>'+
+      '<span class="rn"><input spellcheck="false" maxlength="60"/></span>'+
       '<span class="rmeta">'+meta+'</span><span class="rx" title="Sil">×</span>';
     div.addEventListener("click",e=>{
       if(e.target.classList.contains("rx")){ delRoute(r.id); return; }
@@ -208,6 +210,7 @@ function renderRoutes(){
       activeId=r.id; renderAll(); flyToRoute(r);
     });
     const inp=div.querySelector("input");
+    inp.value=r.name; // düz metin olarak atanır, HTML olarak ayrıştırılmaz
     inp.addEventListener("input",()=>{ r.name=inp.value||"Rota"; if(r.id===activeId)$("#actName").textContent=r.name; persist(); });
     inp.addEventListener("click",e=>e.stopPropagation());
     list.appendChild(div);
@@ -216,7 +219,7 @@ function renderRoutes(){
 function renderAll(){ renderPanel(); renderRoutes(); }
 
 // ---- events ----
-map.on("click",e=>{ hideResults(); if(isMobile()) $("#panel").classList.add("collapsed"); addPoint(e.latlng); });
+map.on("click",e=>{ hideResults(); if(isNarrow()) $("#panel").classList.add("collapsed"); addPoint(e.latlng); });
 $("#collapseBtn").addEventListener("click",()=>$("#panel").classList.toggle("collapsed"));
 $("#snap").addEventListener("click",()=>{
   const r=active(); r.snap=!r.snap;
@@ -281,34 +284,53 @@ function exportGPX(){
 }
 
 // ---- search ----
-// Nominatim kullanım politikası yazarken otomatik tamamlamaya izin vermez: yalnızca Enter ile arar.
-const qEl=$("#q"), resEl=$("#results");
+// Nominatim kullanım politikası yazarken otomatik tamamlamaya izin vermez: yalnızca Enter (ya da
+// ipucu satırına dokunma) ile arar. Yazarken görünen ipucu satırı bunun nedenini kullanıcıya hissettirir.
+const qEl=$("#q"), resEl=$("#results"); let searchSeq=0;
 function hideResults(){ resEl.classList.remove("show"); resEl.innerHTML=""; }
+function rowMsg(text,cls){
+  resEl.innerHTML=""; const d=document.createElement("div"); d.className="res "+cls;
+  const t=document.createElement("div"); t.className="r1"; t.textContent=text; d.appendChild(t);
+  resEl.appendChild(d); resEl.classList.add("show"); return d;
+}
 async function runSearch(q){
   const b=map.getBounds(), vb=[b.getWest(),b.getNorth(),b.getEast(),b.getSouth()].join(",");
   const url="https://nominatim.openstreetmap.org/search?format=jsonv2&limit=6&countrycodes=tr&accept-language=tr&addressdetails=1&dedupe=1&viewbox="+vb+"&bounded=0&q="+encodeURIComponent(q);
-  return (await fetch(url)).json();
+  const r=await fetch(url); if(!r.ok) throw new Error("http "+r.status);
+  return r.json();
+}
+function goToResult(it,main){
+  hideResults(); qEl.value=main;
+  if(isNarrow()) $("#panel").classList.add("collapsed"); // harita görünsün
+  if(it.boundingbox){ const bb=it.boundingbox.map(Number);
+    map.fitBounds([[bb[0],bb[2]],[bb[1],bb[3]]],{...fitPad(),maxZoom:17});
+  }else map.setView([+it.lat,+it.lon],16);
 }
 function showResults(items){
-  if(!items.length){ resEl.innerHTML='<div class="res"><div class="r1" style="color:var(--faint)">Sonuç bulunamadı</div></div>'; resEl.classList.add("show"); return; }
+  if(!items.length){ rowMsg("Sonuç bulunamadı. Mahalle ya da cadde adıyla dene.","msg"); return; }
   resEl.innerHTML="";
   items.forEach(it=>{
-    const parts=(it.display_name||"").split(", "), main=it.name||parts[0]||"";
+    const parts=String(it.display_name||"").split(", "), main=String(it.name||parts[0]||"");
     const sub=parts.slice(main===parts[0]?1:0).slice(0,4).join(", ");
     const d=document.createElement("div"); d.className="res";
-    d.innerHTML='<div class="r1">'+main+'</div><div class="r2">'+sub+'</div>';
-    d.onclick=()=>{ hideResults(); qEl.value=main;
-      if(it.boundingbox){ const bb=it.boundingbox.map(Number);
-        map.fitBounds([[bb[0],bb[2]],[bb[1],bb[3]]],{...fitPad(),maxZoom:17});
-      }else map.setView([+it.lat,+it.lon],16); };
-    resEl.appendChild(d);
+    const r1=document.createElement("div"); r1.className="r1"; r1.textContent=main;   // textContent: HTML olarak yorumlanmaz
+    const r2=document.createElement("div"); r2.className="r2"; r2.textContent=sub;
+    d.append(r1,r2); d.onclick=()=>goToResult(it,main); resEl.appendChild(d);
   });
   resEl.classList.add("show");
 }
-qEl.addEventListener("keydown",async e=>{
-  if(e.key!=="Enter")return; const q=qEl.value.trim(); if(q.length<2)return;
-  try{ showResults(await runSearch(q)); }catch(_){ toast("Arama başarısız."); }
+async function doSearch(){
+  const q=qEl.value.trim(); if(q.length<2) return;
+  const my=++searchSeq; rowMsg("Aranıyor…","msg");
+  try{ const items=await runSearch(q); if(my===searchSeq) showResults(items); }
+  catch(_){ if(my===searchSeq) rowMsg("Arama servisi şu an yanıt vermiyor. Biraz sonra tekrar dene.","msg"); }
+}
+qEl.addEventListener("input",()=>{
+  const q=qEl.value.trim(); searchSeq++;
+  if(q.length<2){ hideResults(); return; }
+  rowMsg("\u201c"+q+"\u201d ara   \u21b5","hint").onclick=doSearch;
 });
+qEl.addEventListener("keydown",e=>{ if(e.key==="Enter"){ e.preventDefault(); doSearch(); } });
 document.addEventListener("click",e=>{ if(!e.target.closest(".qwrap")) hideResults(); });
 
 // ---- init / load ----

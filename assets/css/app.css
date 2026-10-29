@@ -47,6 +47,10 @@
   .res:last-child{border-bottom:0}
   .res:hover{background:rgba(255,176,32,.09)}
   .res .r1{color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .res.msg{cursor:default}
+  .res.msg:hover{background:none}
+  .res.msg .r1{color:var(--muted)}
+  .res.hint .r1{color:var(--accent)}
   .res .r2{color:var(--faint);font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
   .layers{display:flex;gap:5px;padding:0 13px 12px;flex-wrap:wrap}

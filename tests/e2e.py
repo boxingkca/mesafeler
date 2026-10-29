@@ -185,10 +185,10 @@ with sync_playwright() as p:
     pg.wait_for_timeout(1500)
     check("yazarken otomatik arama YAPILMAZ (Nominatim politikası)", len(nominatim) == 0, str(len(nominatim)))
     pg.press("#q", "Enter")
-    pg.wait_for_selector(".res", timeout=5000)
+    pg.wait_for_selector(".res:not(.msg)", timeout=5000)
     check("Enter ile arama yapıldı", len(nominatim) == 1)
     check("Türkiye ile sınırlandırıldı", "countrycodes=tr" in nominatim[0])
-    pg.click(".res")
+    pg.click(".res:not(.msg)")
     pg.wait_for_timeout(500)
     lat = pg.evaluate("map.getCenter().lat")
     check("sonuç seçilince harita oraya gider", abs(lat - 40.978) < 0.05, str(lat))
@@ -287,6 +287,80 @@ with sync_playwright() as p:
         ".filter(u=>u.includes('/assets/'))")
     check("assets/ dosyalarının hepsi ?v=<sürüm> taşır (eski önbellek kodu çalışmasın)",
           srcs and all(u.endswith("?v=" + tag) for u in srcs), f"tag={tag} {srcs}")
+
+    # ------------------------------------------------- arama deneyimi + dar pencere
+    print("Arama deneyimi ve dar pencere")
+    sctx = new_context(browser, viewport={"width": 493, "height": 1041})  # 480 px eşiğinin hemen üstü
+    hits = []
+
+    def nom(route):
+        hits.append(route.request.url)
+        route.fulfill(status=200, content_type="application/json",
+                      headers={"access-control-allow-origin": "*"},
+                      body=json.dumps([{"name": "Moda", "display_name": "Moda, Kadıköy, İstanbul",
+                                        "lat": "40.9811", "lon": "29.0254",
+                                        "boundingbox": ["40.9711", "40.9911", "29.0154", "29.0354"]}]))
+    sctx.route("**/nominatim.openstreetmap.org/**", nom)
+    sp = open_app(sctx)
+    sp.fill("#q", "Moda Kadıköy")
+    sp.wait_for_selector(".res.hint", timeout=3000)
+    check("yazarken ipucu satırı çıkar", "ara" in sp.inner_text(".res.hint"))
+    sp.wait_for_timeout(1200)
+    check("ipucu satırı sunucuya istek atmaz", len(hits) == 0)
+    sp.click(".res.hint")
+    sp.wait_for_selector(".res:not(.msg)", timeout=5000)
+    check("ipucu satırına dokununca arama yapılır", len(hits) == 1)
+    sp.click(".res:not(.msg)")
+    sp.wait_for_timeout(600)
+    z = sp.evaluate("map.getZoom()"); lat = sp.evaluate("map.getCenter().lat")
+    check("493 px pencerede sonuç mahalle ölçeğinde gösterilir (ilçeye kaçmaz)", z >= 13, f"zoom={z}")
+    check("harita doğru yere gider", abs(lat - 40.981) < 0.03, f"lat={lat}")
+    check("dar pencerede panel katlanır", sp.evaluate("document.querySelector('#panel').classList.contains('collapsed')"))
+
+    sctx2 = new_context(browser, viewport={"width": 493, "height": 1041})
+    sctx2.route("**/nominatim.openstreetmap.org/**", lambda r: r.fulfill(status=429, body="Too Many Requests"))
+    sp2 = open_app(sctx2)
+    sp2.fill("#q", "Moda"); sp2.press("#q", "Enter")
+    sp2.wait_for_selector(".res.msg", timeout=5000)
+    try:
+        sp2.wait_for_function("document.querySelector('.res.msg').textContent.includes('yanıt vermiyor')", timeout=5000)
+        shown = True
+    except Exception:
+        shown = False
+    check("arama servisi hata verirse açıklayıcı mesaj görünür", shown)
+
+    fitctx = new_context(browser, viewport={"width": 493, "height": 1041})
+    fp = open_app(fitctx, h)
+    fp.wait_for_timeout(500)
+    check("493 px pencerede paylaşılan rota dünya ölçeğine kaçmaz", fp.evaluate("map.getZoom()") >= 11,
+          str(fp.evaluate("map.getZoom()")))
+
+    # ------------------------------------------------------------ güvenlik
+    print("Güvenlik")
+    import base64
+    EVIL_NAME = '<img src=x onerror="window.__pwned=1">'
+    EVIL_COLOR = 'red;"><img src=x onerror="window.__pwned=2">'
+    payload = {"v": 1, "r": [{"n": __import__("urllib.parse").parse.quote(EVIL_NAME, safe=""), "c": EVIL_COLOR, "s": 0,
+                              "p": enc_poly([(41.0, 29.0), (41.001, 29.001)], 5)}]}
+    evil_hash = "#s=" + base64.b64encode(json.dumps(payload).encode()).decode()
+    xctx = new_context(browser, viewport={"width": 1280, "height": 800})
+    xp = open_app(xctx, evil_hash)
+    xp.wait_for_timeout(1000)
+    check("zararlı paylaşım linki kod çalıştıramaz", xp.evaluate("window.__pwned") is None, str(xp.evaluate("window.__pwned")))
+    nm = xp.locator(".rrow input").evaluate_all("els=>els.map(e=>e.value)")
+    check("zararlı ad düz metin olarak gösterilir", any("<img" in n for n in nm), str(nm))
+    col = xp.evaluate("document.querySelector('.rrow .dot').style.background")
+    check("geçersiz renk paletteki güvenli bir renge düşer", "img" not in col and col != "", col)
+
+    xctx2 = new_context(browser, viewport={"width": 1280, "height": 800})
+    xctx2.route("**/nominatim.openstreetmap.org/**", lambda r: r.fulfill(
+        status=200, content_type="application/json", headers={"access-control-allow-origin": "*"},
+        body=json.dumps([{"name": EVIL_NAME, "display_name": EVIL_NAME + ", İstanbul", "lat": "41.0", "lon": "29.0"}])))
+    xp2 = open_app(xctx2)
+    xp2.fill("#q", "xx"); xp2.press("#q", "Enter")
+    xp2.wait_for_selector(".res:not(.msg)", timeout=5000); xp2.wait_for_timeout(500)
+    check("zararlı yer adı kod çalıştıramaz", xp2.evaluate("window.__pwned") is None)
+    check("zararlı yer adı etiket olarak değil metin olarak görünür", "<img" in xp2.inner_text(".res:not(.msg) .r1"))
 
     # --------------------------------------------------------- hata yok mu
     print("Genel")

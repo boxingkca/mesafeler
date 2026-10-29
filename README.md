@@ -14,9 +14,13 @@ Haritaya marker koyarak **yürüdüğün gerçek mesafeyi** ölç, farklı sokak
 
 ## Neden var
 
-Harita uygulamalarında yürüme rotası seçtiğinde uygulama seni kendi seçtiği yoldan götürür ve sadece iki nokta arasındaki mesafeyi gösterir. Ama asıl merak edilen şey genelde şudur: *"Ben şu sokaklardan yürüsem toplam ne kadar tutar, uygulamanın önerdiği yola göre kaç metre fark eder?"*
+Harita uygulamaları sana **kendi bulduğu** yolu gösterir, senin yürüyeceğin yolu değil.
 
-Mesafeler bunu doğrudan yapar: istediğin kadar nokta koyarsın, her bölümün ve toplamın mesafesini görürsün, ikinci bir rota açıp ikisini kıyaslarsın.
+Yürürken bu fark önemlidir. Bir uygulama çoğu zaman mahalle arasındaki kestirmeyi, apartman geçişini, merdivenli sokağı bilmez; bazen de kendi seçtiği "uygun" yol için rotayı gereksiz uzatır. Üstelik yalnızca onun önerdiği yolun mesafesini söyler. *"Ben şu sokaktan yürürsem ne kadar tutar?"* diye sorma şansın yoktur. Haritada iki nokta seçip aradaki mesafeye bakabilirsin, ama gerçekte yürüdüğün yol o iki nokta arasında düz bir çizgi değil, geçtiğin sokakların toplamıdır.
+
+Mesafeler bu soruyu doğrudan cevaplar: **yol senin, hesap uygulamanın.** Geçeceğin sokakların köşelerine marker koyarsın, uygulama her bölümün ve toplamın gerçek uzunluğunu söyler. Aynı yere giden birden fazla yolu yan yana koyabilirsin, böylece "bu kestirme gerçekten kestirme mi, kaç metre kazandırıyor?" sorusu tahmin olmaktan çıkıp bir rakama dönüşür. Çıkan sonucu da haritanın önerdiği yürüme mesafesiyle karşılaştırabilirsin.
+
+Kısacası: **neyi nereden yürürsen ne kadar tutar, onu öğrenmek için.**
 
 ## Özellikler
 
@@ -26,7 +30,7 @@ Mesafeler bunu doğrudan yapar: istediğin kadar nokta koyarsın, her bölümün
 - **Yola oturt.** İstersen noktaların arası gerçek yaya yoluna oturtulur (aşağıda açıklaması var).
 - **Süre tahmini.** Mesafe ÷ yürüme hızı. Hız 4 ile 6 km/sa arasında değiştirilebilir.
 - **Beş harita katmanı.** Detay (OSM), Renkli, Açık, Koyu ve Uydu. Siyah/gri tonlarda sokaklar zor seçiliyorsa Renkli ya da Detay'a geç. Renkli/Açık/Koyu varsayılan olarak anahtarsız Esri karolarından gelir; ücretsiz bir CARTO anahtarın varsa [aşağıda](#harita-katmanları-ve-carto-anahtarı) CARTO'ya geçirebilirsin.
-- **Türkiye odaklı arama.** Mahalle, cadde ya da yer adı yaz, Enter'a bas, çıkan adaylardan seç.
+- **Türkiye odaklı arama.** Mahalle, cadde ya da yer adı yaz, Enter'a bas (ya da çıkan "ara" satırına dokun), adaylardan birini seç.
 - **Otomatik kayıt.** Rotaların tarayıcında saklanır, sekmeyi kapatıp açınca yerinde durur.
 - **Bağlantıyla paylaş.** Rotalar URL'e gömülür. Linki açan kişinin kendi rotaları ezilmez, paylaşılanlar yanına eklenir.
 - **GPX dışa aktarma.** Telefona, Strava'ya ya da yedek olarak.
@@ -50,17 +54,30 @@ Sonucun kalitesi OSM'deki kaldırım verisine bağlıdır. Google ya da Apple Ma
 
 ## Veri kaynakları ve gizlilik
 
-Uygulamanın kendi sunucusu yoktur, hesap istemez, seni izlemez. Rotaların yalnızca **kendi tarayıcında** (`localStorage`) saklanır. Ama harita, arama ve yol hesabı için üçüncü taraf servislere istek atılır; bu servisler IP adresini ve istediğin bölgeyi görür:
+### Rotalarımı ve konumlarımı başkası görür mü?
+
+**Hayır.** Uygulamanın kendi sunucusu, hesabı ve veritabanı yoktur. Koyduğun marker'lar ve rotalar yalnızca **senin tarayıcında, senin cihazında** (`localStorage`) saklanır. Siteyi başka biri açtığında kendi boş haritasını görür, seninkini değil; sen de onunkini görmezsin. Herkes kendi rotalarını kendi cihazında tutar.
+
+Bir rota ancak **sen "Bağlantı" ile bir link üretip birine gönderirsen** başkasına ulaşır. O linkin içinde yalnızca o anki rotaların noktaları vardır.
+
+Konumunu istediğinde (⊙ düğmesi) tarayıcı izin sorar. Koordinatların tarayıcında kalır: haritayı ortalamak ve mavi noktayı çizmek için kullanılır, bir yere gönderilmez ya da kaydedilmez. Ancak harita o bölgeye gittiği için, harita servisleri o bölgenin karolarını istediğini görür (aşağıdaki tabloya bak).
+
+Kayıtları silmek için rota satırındaki **×**'e bas ya da tarayıcının site verilerini temizle. Aynı alan adı altında (`boxingkca.github.io`) yayınlanan başka sayfalar da aynı tarayıcı deposunu paylaşır; bu yüzden orada başkasının kodunu barındırma.
+
+### Hangi üçüncü taraf servisler kullanılıyor?
+
+Harita, arama ve yol hesabı için dış servislere istek atılır; bu servisler **IP adresini ve baktığın bölgeyi** görür. Rotalarının tamamını görmezler.
 
 | Ne için | Servis | Ne zaman |
 |---|---|---|
 | Harita karoları | OpenStreetMap, Esri (ve istersen CARTO) | Haritayı kaydırırken |
 | Yer arama | OSM Nominatim | Aramada Enter'a basınca |
-| Yola oturtma | FOSSGIS Valhalla | "Yola oturt" açıkken |
+| Yola oturtma | FOSSGIS Valhalla | "Yola oturt" açıkken; rotanın marker koordinatları gönderilir |
 
-- Arama yazarken otomatik tamamlanmaz, yalnızca Enter ile çalışır. Bunun sebebi Nominatim kullanım politikasının otomatik tamamlamaya izin vermemesidir.
+- Arama yazarken otomatik tamamlanmaz, yalnızca Enter ile çalışır. Nominatim kullanım politikası otomatik tamamlamaya izin vermez.
 - Bu servisler ücretsiz kamu altyapısıdır. Aile ve arkadaş ölçeğinde sorun olmaz; yüksek trafikli bir kullanım için kendi servislerine geçmek gerekir.
 - Paylaşım bağlantısındaki rota verisi URL'in `#` kısmında durur. Tarayıcı bu kısmı sunucuya göndermez.
+- Dışarıdan gelen her değer (paylaşılan rotanın adı ve rengi, arama sonuçlarındaki yer adları) sayfaya düz metin olarak yerleştirilir ve doğrulanır; bir link ya da yer adı sitede kod çalıştıramaz.
 
 ## Harita katmanları ve CARTO anahtarı
 
