@@ -6,14 +6,14 @@ Katkı ve geri bildirim memnuniyetle karşılanır.
 [Issue aç](https://github.com/boxingkca/mesafeler/issues/new/choose) ve şunları yaz: hangi tarayıcı ve cihaz, ne yaptın, ne bekledin, ne oldu. Mümkünse paylaşım bağlantısını ekle; sorunu bire bir tekrar etmemizi sağlar.
 
 ## Geliştirme
-Derleme adımı yoktur. Bkz. [README: Yerelde çalıştırma](README.md#yerelde-çalıştırma).
+Derleme adımı yoktur. Bkz. [README: Yerelde çalıştırma](../README.md#yerelde-çalıştırma).
 
 1. Depoyu çatalla (fork), bir dal aç.
 2. Değişikliği yap. Gerekirse `tests/e2e.py` içine test ekle.
 3. Testi çalıştır, PR aç.
 
 ## Sürüm çıkarırken
-`index.html` içindeki sürüm etiketini (`v1.0.2`) ve `assets/` adreslerindeki `?v=1.0.2` değerini birlikte artır, `CHANGELOG.md` içine not düş. Aksi halde ziyaretçilerin tarayıcısı eski kodu önbellekten çalıştırabilir.
+`index.html` içindeki sürüm etiketini (`v1.0.3`) ve `assets/` adreslerindeki `?v=1.0.3` değerini birlikte artır, `docs/CHANGELOG.md` içine not düş. Aksi halde ziyaretçilerin tarayıcısı eski kodu önbellekten çalıştırabilir.
 
 ## Kurallar
 - **Gizli bilgi commit etme.** Özellikle `.p8` dosyalarını ve özel anahtarları. `config.js` herkese açıktır.

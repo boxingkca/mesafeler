@@ -367,6 +367,29 @@ with sync_playwright() as p:
     allerr = pg.errors + pg2.errors + src.errors + fresh.errors + mob.errors
     check("hiç JavaScript hatası yok", not allerr, str(allerr[:3]))
 
+    # Dosya taşımalarında bir yolu kaçırmak siteyi sessizce bozar; yerel isteklerin hiçbiri 404 vermemeli
+    lctx = new_context(browser, viewport={"width": 1280, "height": 800})
+    lpg = lctx.new_page()
+    bad = []
+    origin = BASE.split("/", 3)[0] + "//" + BASE.split("/", 3)[2]
+    lpg.on("response", lambda r: bad.append(f"{r.status} {r.url}") if r.url.startswith(origin) and r.status >= 400 else None)
+    lpg.goto(BASE)
+    lpg.wait_for_selector(".leaflet-container")
+    lpg.wait_for_timeout(800)
+    check("sayfanın yüklediği hiçbir yerel dosya 404 vermez", not bad, str(bad))
+
+    cdp = lctx.new_cdp_session(lpg)
+    cdp.send("Page.enable")
+    man = cdp.send("Page.getAppManifest")
+    check("manifest hatasız çözülür", not man.get("errors") and man.get("data"), str(man.get("errors")))
+    mdata = json.loads(man["data"]) if man.get("data") else {}
+    check("manifest ikonları ve başlangıç adresi geçerli",
+          mdata.get("icons") and all(i["src"].startswith("icons/") for i in mdata["icons"]) and mdata.get("start_url") == "../",
+          str(mdata)[:200])
+    for i in mdata.get("icons", []):
+        r = lctx.request.get(BASE + "assets/" + i["src"])
+        check("manifest ikonu erişilebilir: " + i["src"], r.status == 200, str(r.status))
+
     browser.close()
 
 print(f"\n{passed} geçti, {len(failures)} başarısız")

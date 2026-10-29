@@ -20,5 +20,5 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-Third-party software: Leaflet (vendor/leaflet) is distributed under the
-BSD-2-Clause license; see vendor/leaflet/LICENSE.
+Third-party software: Leaflet (assets/vendor/leaflet) is distributed under the
+BSD-2-Clause license; see assets/vendor/leaflet/LICENSE.

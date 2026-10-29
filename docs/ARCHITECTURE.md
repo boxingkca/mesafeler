@@ -53,7 +53,7 @@ Bağlantı `#s=` ardından base64 kodlu JSON taşır. Her rota için noktalar Go
 
 ## Önbellek sürümleme
 
-GitHub Pages dosyaları yaklaşık 10 dakika önbelleğe aldırır. `index.html` yenilenip `app.js` eski kalırsa kullanıcı yeni sayfayı eski kodla çalıştırır. Bu yüzden `index.html` içindeki `assets/` adresleri `?v=<sürüm>` taşır ve arayüzdeki sürüm etiketiyle aynı olmak zorundadır. **Her sürümde ikisini birlikte artır**; e2e testi uyuşmazlığı yakalar.
+GitHub Pages dosyaları yaklaşık 10 dakika önbelleğe aldırır. `index.html` yenilenip `app.js` eski kalırsa kullanıcı yeni sayfayı eski kodla çalıştırır. Bu yüzden `index.html` içindeki `assets/` altındaki tüm adresler (Leaflet dahil) `?v=<sürüm>` taşır ve arayüzdeki sürüm etiketiyle aynı olmak zorundadır. **Her sürümde ikisini birlikte artır**; e2e testi uyuşmazlığı yakalar.
 
 ## Duyarlı davranış
 

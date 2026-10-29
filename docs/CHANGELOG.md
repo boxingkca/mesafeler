@@ -2,6 +2,15 @@
 
 Biçim [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/), sürümleme [SemVer](https://semver.org/lang/tr/) ilkelerine dayanır.
 
+## [1.0.3] - 2026-10-29
+
+### Değişti
+- Depo düzeni sadeleştirildi: kök dizinde yalnızca `index.html`, `README.md`, `LICENSE` ve klasörler kalır. `vendor/leaflet`, `favicon.svg` ve `manifest.webmanifest` `assets/` altına, `CHANGELOG.md` `docs/` altına, `CONTRIBUTING.md` `.github/` altına taşındı.
+- Leaflet dosyaları da sürüm parametresi (`?v=`) taşır.
+
+### Eklendi
+- Testler: sayfanın yüklediği hiçbir yerel dosya 404 vermemeli, manifest hatasız çözülmeli
+
 ## [1.0.2] - 2026-10-29
 
 ### Güvenlik
@@ -49,4 +58,4 @@ Biçim [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/), sürümleme [Se
 - Arama artık yazarken otomatik çalışmaz, yalnızca Enter ile arar (Nominatim kullanım politikası)
 
 ## [Planlanan]
-- Apple Maps (MapKit JS) katmanı, bkz. [docs/APPLE-MAPS.md](docs/APPLE-MAPS.md)
+- Apple Maps (MapKit JS) katmanı, bkz. [APPLE-MAPS.md](APPLE-MAPS.md)

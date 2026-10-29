@@ -107,22 +107,25 @@ python3 -m http.server 8000
 
 ```
 mesafeler/
-├── index.html              Sayfa iskeleti ve meta etiketleri
-├── manifest.webmanifest    Ana ekrana eklenebilir (PWA) tanımı
-├── favicon.svg
+├── index.html                  Sayfa iskeleti (GitHub Pages buradan açar)
+├── README.md
+├── LICENSE
 ├── assets/
-│   ├── css/app.css         Tüm arayüz stilleri
-│   ├── js/app.js           Uygulama mantığı
-│   ├── js/config.js        Çalışma zamanı ayarları (gizli bilgi konmaz)
-│   └── icons/              Uygulama ikonları
-├── vendor/leaflet/         Leaflet 1.9.4 (depoya gömülü, CDN gerekmez)
+│   ├── css/app.css             Tüm arayüz stilleri
+│   ├── js/app.js               Uygulama mantığı
+│   ├── js/config.js            Çalışma zamanı ayarları (gizli bilgi konmaz)
+│   ├── icons/                  Uygulama ikonları
+│   ├── favicon.svg
+│   ├── manifest.webmanifest    Ana ekrana eklenebilir (PWA) tanımı
+│   └── vendor/leaflet/         Leaflet 1.9.4 (depoya gömülü, CDN gerekmez)
 ├── docs/
-│   ├── ARCHITECTURE.md     Kod yapısı ve tasarım kararları
-│   └── APPLE-MAPS.md       Apple Maps (MapKit JS) kurulum rehberi
-├── tools/
-│   └── generate-mapkit-token.mjs
-├── tests/e2e.py            Uçtan uca tarayıcı testi
-└── .github/                CI, issue şablonları
+│   ├── ARCHITECTURE.md         Kod yapısı ve tasarım kararları
+│   ├── APPLE-MAPS.md           Apple Maps (MapKit JS) kurulum rehberi
+│   ├── CHANGELOG.md            Sürüm notları
+│   └── screenshot-panel.png
+├── tests/e2e.py                Uçtan uca tarayıcı testi
+├── tools/generate-mapkit-token.mjs
+└── .github/                    CI, katkı rehberi, issue şablonları
 ```
 
 ## Test
@@ -143,7 +146,7 @@ python3 tests/e2e.py
 - [ ] GPX içe aktarma
 - [ ] Çevrimdışı kabuk (service worker)
 
-Değişiklikler için [CHANGELOG.md](CHANGELOG.md), katkı için [CONTRIBUTING.md](CONTRIBUTING.md).
+Değişiklikler için [docs/CHANGELOG.md](docs/CHANGELOG.md), katkı için [.github/CONTRIBUTING.md](.github/CONTRIBUTING.md).
 
 ## Lisans ve teşekkür
 
