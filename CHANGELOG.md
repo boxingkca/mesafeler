@@ -8,6 +8,7 @@ Biçim [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/), sürümleme [Se
 - CARTO, tüm karolar için API anahtarı istemeye başladığından Renkli, Açık ve Koyu katmanlarda "API KEY REQUIRED" filigranı görünüyordu. Bu katmanlar artık varsayılan olarak anahtarsız Esri karolarından gelir; `config.js` içine ücretsiz bir `cartoKey` girilirse CARTO kullanılır.
 
 ### Eklendi
+- `assets/` adreslerine sürüm parametresi (`?v=`): sayfa güncellenince tarayıcı eski kodu önbellekten çalıştırmaz; testle denetlenir
 - Katman sağlayıcısını denetleyen testler (anahtar yokken CARTO'ya istek gitmemesi, anahtar varken her isteğin anahtarı taşıması)
 
 ## [1.0.0] - 2026-10-29

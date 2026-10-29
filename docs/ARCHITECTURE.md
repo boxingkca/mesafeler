@@ -51,6 +51,10 @@ Bağlantı `#s=` ardından base64 kodlu JSON taşır. Her rota için noktalar Go
 
 `BASEMAPS` nesnesi her katmanı bir ya da birkaç Leaflet karo katmanı olarak tanımlar (Uydu, görüntü ve etiket olmak üzere iki katmandır). Yeni bir katman eklemek bu nesneye bir giriş eklemekten ibarettir. Esri karolarında `maxNativeZoom` gerçek karo derinliğine ayarlıdır (Açık/Koyu için 16); daha yakın zoom'da Leaflet karoyu büyütür, harita boş kalmaz. Seçilen katman kayıtla birlikte saklanır.
 
+## Önbellek sürümleme
+
+GitHub Pages dosyaları yaklaşık 10 dakika önbelleğe aldırır. `index.html` yenilenip `app.js` eski kalırsa kullanıcı yeni sayfayı eski kodla çalıştırır. Bu yüzden `index.html` içindeki `assets/` adresleri `?v=<sürüm>` taşır ve arayüzdeki sürüm etiketiyle aynı olmak zorundadır. **Her sürümde ikisini birlikte artır**; e2e testi uyuşmazlığı yakalar.
+
 ## Duyarlı davranış
 
 `fitPad()` panelin kapladığı alanı hesaba katarak harita sığdırma payını belirler: masaüstünde sol sütun, 480 px altında üstteki panelin yüksekliği. Bu hesap olmadan dar ekranda sığdırma "yer yok" sonucuna varır ve harita dünya ölçeğine uzaklaşır. Mobilde haritaya ilk dokunuş paneli katlar.

@@ -12,6 +12,9 @@ Derleme adımı yoktur. Bkz. [README: Yerelde çalıştırma](README.md#yerelde-
 2. Değişikliği yap. Gerekirse `tests/e2e.py` içine test ekle.
 3. Testi çalıştır, PR aç.
 
+## Sürüm çıkarırken
+`index.html` içindeki sürüm etiketini (`v1.0.1`) ve `assets/` adreslerindeki `?v=1.0.1` değerini birlikte artır, `CHANGELOG.md` içine not düş. Aksi halde ziyaretçilerin tarayıcısı eski kodu önbellekten çalıştırabilir.
+
 ## Kurallar
 - **Gizli bilgi commit etme.** Özellikle `.p8` dosyalarını ve özel anahtarları. `config.js` herkese açıktır.
 - Bağımlılık eklemeden önce konuş. Hedef, kurulumsuz ve küçük kalmak.
