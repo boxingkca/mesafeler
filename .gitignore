@@ -1,0 +1,16 @@
+# Apple Developer özel anahtarları: ASLA commit edilmez
+*.p8
+AuthKey_*.p8
+*.pem
+*.key
+
+# Yerel ortam
+.DS_Store
+node_modules/
+.env
+.env.*
+*.log
+
+# Test çıktıları
+tests/__pycache__/
+tests/artifacts/
