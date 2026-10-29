@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: JavaScript sözdizimi
+        run: |
+          node --check assets/js/app.js
+          node --check assets/js/config.js
+          node --check tools/generate-mapkit-token.mjs
+
+      - name: Özel anahtar sızıntısı kontrolü
+        run: |
+          if git ls-files | grep -E '\.p8$|\.pem$'; then
+            echo "::error::Özel anahtar dosyası depoda"; exit 1
+          fi
+          if git grep -nI 'BEGIN [A-Z ]*PRIVATE KEY' -- . ':!tools/' ':!docs/'; then
+            echo "::error::Özel anahtar içeriği bulundu"; exit 1
+          fi
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Uçtan uca test
+        run: |
+          pip install playwright
+          playwright install --with-deps chromium
+          python3 -m http.server 8777 &
+          sleep 1
+          python3 tests/e2e.py
