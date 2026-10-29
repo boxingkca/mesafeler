@@ -25,7 +25,7 @@ Mesafeler bunu doğrudan yapar: istediğin kadar nokta koyarsın, her bölümün
 - **Rota karşılaştırma.** Birden fazla rota aç, en kısası işaretlenir, diğerlerinin farkı metre ve yüzde olarak yazılır.
 - **Yola oturt.** İstersen noktaların arası gerçek yaya yoluna oturtulur (aşağıda açıklaması var).
 - **Süre tahmini.** Mesafe ÷ yürüme hızı. Hız 4 ile 6 km/sa arasında değiştirilebilir.
-- **Beş harita katmanı.** Detay (OSM), Renkli, Açık, Koyu ve Uydu. Siyah/gri tonlarda sokaklar zor seçiliyorsa Açık ya da Detay'a geç.
+- **Beş harita katmanı.** Detay (OSM), Renkli, Açık, Koyu ve Uydu. Siyah/gri tonlarda sokaklar zor seçiliyorsa Renkli ya da Detay'a geç. Renkli/Açık/Koyu varsayılan olarak anahtarsız Esri karolarından gelir; ücretsiz bir CARTO anahtarın varsa [aşağıda](#harita-katmanları-ve-carto-anahtarı) CARTO'ya geçirebilirsin.
 - **Türkiye odaklı arama.** Mahalle, cadde ya da yer adı yaz, Enter'a bas, çıkan adaylardan seç.
 - **Otomatik kayıt.** Rotaların tarayıcında saklanır, sekmeyi kapatıp açınca yerinde durur.
 - **Bağlantıyla paylaş.** Rotalar URL'e gömülür. Linki açan kişinin kendi rotaları ezilmez, paylaşılanlar yanına eklenir.
@@ -54,13 +54,24 @@ Uygulamanın kendi sunucusu yoktur, hesap istemez, seni izlemez. Rotaların yaln
 
 | Ne için | Servis | Ne zaman |
 |---|---|---|
-| Harita karoları | OpenStreetMap, CARTO, Esri | Haritayı kaydırırken |
+| Harita karoları | OpenStreetMap, Esri (ve istersen CARTO) | Haritayı kaydırırken |
 | Yer arama | OSM Nominatim | Aramada Enter'a basınca |
 | Yola oturtma | FOSSGIS Valhalla | "Yola oturt" açıkken |
 
 - Arama yazarken otomatik tamamlanmaz, yalnızca Enter ile çalışır. Bunun sebebi Nominatim kullanım politikasının otomatik tamamlamaya izin vermemesidir.
 - Bu servisler ücretsiz kamu altyapısıdır. Aile ve arkadaş ölçeğinde sorun olmaz; yüksek trafikli bir kullanım için kendi servislerine geçmek gerekir.
 - Paylaşım bağlantısındaki rota verisi URL'in `#` kısmında durur. Tarayıcı bu kısmı sunucuya göndermez.
+
+## Harita katmanları ve CARTO anahtarı
+
+Detay katmanı OpenStreetMap'in standart karolarıdır, anahtar istemez. Renkli, Açık ve Koyu katmanlar **varsayılan olarak Esri'nin anahtarsız karolarından** gelir. Uydu da Esri'dir.
+
+CARTO'nun güzel Voyager / Positron / Dark Matter stilleri ise artık ücretsiz bir API anahtarı ister; anahtarsız karolara "API KEY REQUIRED" filigranı basılır. İstersen:
+
+1. [carto.com/basemaps/apikey](https://carto.com/basemaps/apikey/) adresinden ücretsiz anahtar al (kişisel ve kâr amacı gütmeyen kullanım için ücretsiz; koşullar CARTO'nun sayfasında).
+2. `assets/js/config.js` içindeki `cartoKey` alanına yapıştır.
+
+Anahtar tarayıcıya gönderilir, yani herkese açık olması doğaldır. Anahtar girilince Renkli/Açık/Koyu otomatik olarak CARTO'ya geçer, ek bir şey gerekmez. Ücretsiz sağlayıcıların koşulları değişebilir (CARTO'nun yakın zamanda değiştirdiği gibi); katman listesi `app.js` içinde `BASEMAPS` nesnesinde tutulur ve değiştirmek tek yerden yapılır.
 
 ## Yerelde çalıştırma
 
@@ -121,4 +132,4 @@ Değişiklikler için [CHANGELOG.md](CHANGELOG.md), katkı için [CONTRIBUTING.m
 
 Kod [MIT](LICENSE) lisanslıdır. © 2026 Kadir Can Arabacı.
 
-Harita verisi © [OpenStreetMap katkıcıları](https://www.openstreetmap.org/copyright) (ODbL). Karo stilleri © [CARTO](https://carto.com/attributions). Uydu görüntüsü Esri, Maxar, Earthstar Geographics. Harita motoru [Leaflet](https://leafletjs.com) (BSD-2-Clause). Yaya yönlendirmesi [FOSSGIS](https://fossgis.de) Valhalla sunucusu, arama [Nominatim](https://nominatim.org).
+Harita verisi © [OpenStreetMap katkıcıları](https://www.openstreetmap.org/copyright) (ODbL). Renkli/Açık/Koyu ve Uydu karoları © Esri (CARTO anahtarı girilirse stiller © [CARTO](https://carto.com/attributions)). Uydu görüntüsü Esri, Maxar, Earthstar Geographics. Harita motoru [Leaflet](https://leafletjs.com) (BSD-2-Clause). Yaya yönlendirmesi [FOSSGIS](https://fossgis.de) Valhalla sunucusu, arama [Nominatim](https://nominatim.org).

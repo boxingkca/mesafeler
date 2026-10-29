@@ -2,6 +2,14 @@
 
 Biçim [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/), sürümleme [SemVer](https://semver.org/lang/tr/) ilkelerine dayanır.
 
+## [1.0.1] - 2026-10-29
+
+### Düzeltildi
+- CARTO, tüm karolar için API anahtarı istemeye başladığından Renkli, Açık ve Koyu katmanlarda "API KEY REQUIRED" filigranı görünüyordu. Bu katmanlar artık varsayılan olarak anahtarsız Esri karolarından gelir; `config.js` içine ücretsiz bir `cartoKey` girilirse CARTO kullanılır.
+
+### Eklendi
+- Katman sağlayıcısını denetleyen testler (anahtar yokken CARTO'ya istek gitmemesi, anahtar varken her isteğin anahtarı taşıması)
+
 ## [1.0.0] - 2026-10-29
 
 İlk herkese açık sürüm.

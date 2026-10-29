@@ -49,7 +49,7 @@ Bağlantı `#s=` ardından base64 kodlu JSON taşır. Her rota için noktalar Go
 
 ## Harita katmanları
 
-`BASEMAPS` nesnesi her katmanı bir ya da birkaç Leaflet karo katmanı olarak tanımlar (Uydu, görüntü ve etiket olmak üzere iki katmandır). Yeni bir katman eklemek bu nesneye bir giriş eklemekten ibarettir. Seçilen katman kayıtla birlikte saklanır.
+`BASEMAPS` nesnesi her katmanı bir ya da birkaç Leaflet karo katmanı olarak tanımlar (Uydu, görüntü ve etiket olmak üzere iki katmandır). Yeni bir katman eklemek bu nesneye bir giriş eklemekten ibarettir. Esri karolarında `maxNativeZoom` gerçek karo derinliğine ayarlıdır (Açık/Koyu için 16); daha yakın zoom'da Leaflet karoyu büyütür, harita boş kalmaz. Seçilen katman kayıtla birlikte saklanır.
 
 ## Duyarlı davranış
 
@@ -59,7 +59,7 @@ Bağlantı `#s=` ardından base64 kodlu JSON taşır. Her rota için noktalar Go
 
 | Servis | Kullanım | Not |
 |---|---|---|
-| OSM / CARTO / Esri karoları | Harita | Atıf (attribution) zorunludur, görünür bırakılır |
+| OSM / Esri karoları (opsiyonel CARTO) | Harita | Atıf (attribution) zorunludur, görünür bırakılır. CARTO anahtar ister; `config.js` içinde `cartoKey` doluysa kullanılır, boşsa aynı katmanlar Esri'den gelir |
 | Nominatim | Arama | Otomatik tamamlama yasak: yalnızca Enter ile arar |
 | FOSSGIS Valhalla | Yola oturtma | `costing: pedestrian`. Hata olursa düz çizgiye düşer |
 

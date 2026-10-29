@@ -10,15 +10,23 @@ const map=L.map("map",{zoomControl:false}).setView(CFG.defaultCenter||[41.0082,2
 L.control.zoom({position:"bottomright"}).addTo(map);
 
 // ---- basemaps ----
-const A_OSM='© OpenStreetMap', A_CARTO='© OSM © CARTO', A_ESRI='Esri, Maxar, Earthstar';
+// CARTO, basemaps.cartocdn.com altındaki tüm karolar için ücretsiz bir API anahtarı ister
+// (anahtarsız karolara "API KEY REQUIRED" filigranı basar). Bu yüzden:
+//   - config.js içinde cartoKey doluysa Renkli/Açık/Koyu CARTO'dan gelir,
+//   - boşsa aynı üç katman anahtarsız Esri karolarından gelir.
+const A_OSM='© OpenStreetMap', A_CARTO='© OpenStreetMap contributors, © CARTO', A_ESRI='Tiles © Esri';
+const CARTO_KEY=String(CFG.cartoKey||"").trim();
+const carto=(path)=>L.tileLayer("https://{s}.basemaps.cartocdn.com/"+path+"/{z}/{x}/{y}{r}.png?key="+encodeURIComponent(CARTO_KEY),
+  {maxZoom:20,subdomains:"abcd",attribution:A_CARTO});
+// maxNativeZoom: Esri'nin gerçek karo derinliği; daha yakın zoom'da karo büyütülür, harita boşalmaz
+const esri=(svc,nat,attr)=>L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/"+svc+"/MapServer/tile/{z}/{y}/{x}",
+  {maxZoom:19,maxNativeZoom:nat,attribution:attr===undefined?A_ESRI:attr});
 const BASEMAPS={
   detay:{label:"Detay",layers:[L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:A_OSM})]},
-  renkli:{label:"Renkli",layers:[L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",{maxZoom:20,subdomains:"abcd",attribution:A_CARTO})]},
-  acik:{label:"Açık",layers:[L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",{maxZoom:20,subdomains:"abcd",attribution:A_CARTO})]},
-  koyu:{label:"Koyu",layers:[L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",{maxZoom:20,subdomains:"abcd",attribution:A_CARTO})]},
-  uydu:{label:"Uydu",layers:[
-    L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",{maxZoom:19,attribution:A_ESRI}),
-    L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}",{maxZoom:19,attribution:""})]},
+  renkli:{label:"Renkli",layers:CARTO_KEY?[carto("rastertiles/voyager")]:[esri("World_Street_Map",19)]},
+  acik:{label:"Açık",layers:CARTO_KEY?[carto("light_all")]:[esri("Canvas/World_Light_Gray_Base",16),esri("Canvas/World_Light_Gray_Reference",16,"")]},
+  koyu:{label:"Koyu",layers:CARTO_KEY?[carto("dark_all")]:[esri("Canvas/World_Dark_Gray_Base",16),esri("Canvas/World_Dark_Gray_Reference",16,"")]},
+  uydu:{label:"Uydu",layers:[esri("World_Imagery",19),esri("Reference/World_Boundaries_and_Places",19,"")]},
 };
 let baseKey=null;
 function setBasemap(key){

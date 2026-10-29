@@ -244,6 +244,39 @@ with sync_playwright() as p:
     mob.wait_for_timeout(300)
     check("haritaya dokununca panel katlanır", mob.evaluate("document.querySelector('#panel').classList.contains('collapsed')"))
 
+    # ------------------------------------------------------ harita katmanları
+    print("Harita katmanları")
+
+    def tile_urls_for(cfg_key):
+        c = new_context(browser, viewport={"width": 1280, "height": 800})
+        if cfg_key:
+            c.route("**/assets/js/config.js", lambda r: r.fulfill(
+                status=200, content_type="application/javascript",
+                body='window.MESAFELER_CONFIG={cartoKey:"%s"};' % cfg_key))
+        pgx = c.new_page()
+        urls = []
+        pgx.on("request", lambda rq: urls.append(rq.url))
+        pgx.goto(BASE)
+        pgx.wait_for_selector(".leaflet-container")
+        for k in ("renkli", "acik", "koyu", "uydu", "detay"):
+            pgx.click(".pill[data-k=%s]" % k)
+            pgx.wait_for_timeout(250)
+        return urls
+
+    nokey = tile_urls_for(None)
+    check("anahtar yokken CARTO'ya hiç istek gitmez (filigran çıkmaz)",
+          not any("cartocdn.com" in u for u in nokey))
+    check("anahtar yokken Renkli/Açık/Koyu Esri'den gelir",
+          sum("arcgisonline.com" in u and "World_Street_Map" in u for u in nokey) > 0
+          and sum("World_Light_Gray_Base" in u for u in nokey) > 0
+          and sum("World_Dark_Gray_Base" in u for u in nokey) > 0)
+
+    withkey = tile_urls_for("TESTKEY123")
+    carto = [u for u in withkey if "cartocdn.com" in u]
+    check("anahtar girilince CARTO katmanları kullanılır", len(carto) > 0)
+    check("her CARTO isteği anahtarı taşır", carto and all("key=TESTKEY123" in u for u in carto),
+          str([u for u in carto if "key=TESTKEY123" not in u][:2]))
+
     # --------------------------------------------------------- hata yok mu
     print("Genel")
     allerr = pg.errors + pg2.errors + src.errors + fresh.errors + mob.errors
