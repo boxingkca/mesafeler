@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+<title>Mesafeler: Yürüyüş Mesafesi Ölçer</title>
+<meta name="description" content="Haritaya marker koyarak yürüdüğün gerçek mesafeyi ölç, farklı sokak rotalarını yan yana karşılaştır. Kurulum yok, hesap yok." />
+<meta name="theme-color" content="#0f1319" />
+<meta name="color-scheme" content="dark" />
+
+<meta property="og:type" content="website" />
+<meta property="og:title" content="Mesafeler: Yürüyüş Mesafesi Ölçer" />
+<meta property="og:description" content="Marker koy, yürüdüğün mesafeyi gör, rotaları karşılaştır." />
+<meta property="og:locale" content="tr_TR" />
+<meta property="og:image" content="assets/icons/icon-512.png" />
+
+<link rel="icon" type="image/svg+xml" href="favicon.svg" />
+<link rel="apple-touch-icon" href="assets/icons/icon-180.png" />
+<link rel="manifest" href="manifest.webmanifest" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Mesafeler" />
+
+<link rel="stylesheet" href="vendor/leaflet/leaflet.css" />
+<link rel="stylesheet" href="assets/css/app.css" />
+</head>
+<body>
+<div id="map"></div>
+
+<div id="panel">
+  <div class="head">
+    <h1>Yürüyüş Mesafesi</h1>
+    <span class="tag mono">v1.0</span>
+    <span class="headdist mono" id="headDist">0 m</span>
+    <button class="collapse" id="collapseBtn" title="Paneli küçült/aç">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 15l6-6 6 6"/></svg>
+    </button>
+  </div>
+
+  <div class="search">
+    <div class="qwrap">
+      <input id="q" type="text" placeholder="Mahalle, cadde, yer ara ve Enter'a bas" autocomplete="off" />
+      <div class="results" id="results"></div>
+    </div>
+    <button class="icobtn" id="locBtn" title="Konumum">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
+    </button>
+  </div>
+
+  <div class="layers" id="layers"></div>
+
+  <div class="body">
+    <div class="total">
+      <div class="snapwrap"><span>yola oturt</span><div class="sw" id="snap" title="Marker'ları gerçek yürüyüş yollarına oturtur"></div></div>
+      <div class="lbl rname"><span class="dot" id="actDot"></span><span id="actName">Rota 1</span></div>
+      <div class="big mono"><span id="distVal">0</span><small id="distUnit">m</small></div>
+      <div class="dur"><span id="durVal">~0 dk</span> · <span class="pace" id="paceBtn">5.0</span> km/h</div>
+      <div class="sub" id="ptCount">Haritaya tıklayarak başla</div>
+    </div>
+
+    <div class="seglist">
+      <div class="seghd"><span>Ara mesafeler</span><span class="mono" id="segTotal"></span></div>
+      <div class="segs" id="segs"><div class="empty">Ardışık marker'lar arası mesafe ve toplam burada listelenir.</div></div>
+    </div>
+
+    <div class="ctrls">
+      <button class="btn" id="undoBtn" disabled>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 14L4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-1"/></svg>Geri al
+      </button>
+      <button class="btn danger" id="clearBtn" disabled>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg>Temizle
+      </button>
+    </div>
+
+    <div class="ctrls last">
+      <button class="btn" id="shareBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>Bağlantı
+      </button>
+      <button class="btn" id="gpxBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12M8 11l4 4 4-4M4 19h16"/></svg>GPX
+      </button>
+    </div>
+
+    <div class="routes">
+      <div class="rhd"><span>Rotalar · karşılaştır</span><button class="addr" id="addRoute">+ Yeni</button></div>
+      <div id="routeList"></div>
+    </div>
+
+    <div class="hint">
+      Haritaya tıkla → marker ekle. Marker'ı <b>sürükle</b>. <kbd>⌘/Ctrl+Z</kbd> geri al.
+      Rota satırına tıkla, harita odaklanır. GPX ile telefona/Strava'ya aktar.
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script src="vendor/leaflet/leaflet.js"></script>
+<script src="assets/js/config.js"></script>
+<script src="assets/js/app.js"></script>
+</body>
+</html>
